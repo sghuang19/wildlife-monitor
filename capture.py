@@ -1,15 +1,14 @@
-from subprocess import Popen, PIPE
-from PIL import Image
-from io import BytesIO
+from cv2 import VideoCapture
+from time import sleep
 
 def capture():
-    # Run fswebcam command to capture image
-    command = "fswebcam -"
-    process = Popen(command.split(), stdout=PIPE)
-    output, _ = process.communicate()
-
-    # Convert output to PIL Image
-    image = Image.open(BytesIO(output))
-
-    return image
+    cam = VideoCapture(0)
+    retval = False
+    while True:
+        retval, frame = cam.read()
+        if not retval:
+            print("Failed to capture a frame, retrying")
+            sleep(1)
+        else:
+            return frame
 
