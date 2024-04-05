@@ -16,9 +16,10 @@ def init():
     model = YOLO("yolov8n.pt")
 
 
-def detect(path):
+def detect(image):
+    # image can be either a path or a PIL object
     global model
-    return model(path)
+    return model(image)
 
 
 def compare(results):
@@ -28,8 +29,7 @@ def compare(results):
         name = result.names[cls.item()]  # get name of the class
         if name in config.CLASSES:
             classes.add(name)
-    print(classes)
-    # TODO: invoke the notify function
+    return classes
 
 
 if __name__ == "__main__":
@@ -40,5 +40,6 @@ if __name__ == "__main__":
         path = sys.argv[1]
     init()
     results = detect(path)
-    compare(results)
+    classes = compare(results)
+    print(classes)
 
