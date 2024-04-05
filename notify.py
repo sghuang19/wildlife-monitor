@@ -18,3 +18,4 @@ def notify(msg):
 if __name__ == "__main__":
     msg = message({"cat", "dog"})
     notify(msg)
+
