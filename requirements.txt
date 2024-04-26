@@ -1,0 +1,4 @@
+sparkfun-qwiic-pir
+ultralytics
+tqdm
+opencv-python
