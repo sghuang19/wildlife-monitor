@@ -1,39 +1,27 @@
-from __future__ import print_function
 import qwiic_pir
-import time
+from time import sleep
 import sys
+from tqdm import tqdm
 
-def run_example():
 
-	print("\nSparkFun Qwiic PIR  Example 2\n")
-	my_PIR = qwiic_pir.QwiicPIR()
+def pir_init():
+    pir = qwiic_pir.QwiicPIR()
 
-	if my_PIR.begin() == False:
-		print("The Qwiic PIR isn't connected to the system. Please check your connection", \
-			file=sys.stderr)
-		return
+    if not pir.begin():
+        print("[ERROR] Qwiic PIR isn't connected to the system.",
+              file=sys.stderr)
+        return
 
-	print ("Waiting 30 seconds for PIR to stabilize")
-	for i in range(0, 30):
-		print(i)
-		time.sleep(1)
+    print("[INFO] Waiting 30 secs for PIR to stabilize")
+    for _ in tqdm(range(30), "Stabilizing PIR", bar_format="{l_bar}{bar}"):
+        sleep(1)
+    print("[INFO] Device Stable")
 
-	print("Device Stable")
+    return pir
 
-	while True:
-		if my_PIR.available() is True:
-			if my_PIR.object_detected():
-				print("Object Detected")
-				print("Doing something...")
-				sleep(10)
-			if my_PIR.object_removed():
-				print("Object Removed")
-			my_PIR.clear_event_bits()
-		time.sleep(0.2)
 
 if __name__ == '__main__':
-	try:
-		run_example()
-	except (KeyboardInterrupt, SystemExit) as exErr:
-		print("\nEnding Example 2")
-		sys.exit(0)
+    try:
+        pir = pir_init()
+    except (KeyboardInterrupt, SystemExit) as exErr:
+        sys.exit(0)
