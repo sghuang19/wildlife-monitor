@@ -13,7 +13,8 @@ def pir_init():
         return
 
     print("[INFO] Waiting 30 secs for PIR to stabilize")
-    for _ in tqdm(range(30), "Stabilizing PIR", bar_format="{l_bar}{bar}"):
+    for _ in tqdm(range(30),
+                  "[INFO] Stabilizing PIR", bar_format="{l_bar}{bar}"):
         sleep(1)
     print("[INFO] Device Stable")
 

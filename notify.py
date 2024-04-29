@@ -6,7 +6,7 @@ from sys import stderr
 
 def message(classes):
     # create a message
-    return f"[INFO] Animals detected: {', '.join(classes)}"
+    return f"Animals detected: {', '.join(classes)}"
 
 
 def notify(msg):

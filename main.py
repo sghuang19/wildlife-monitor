@@ -21,7 +21,10 @@ def check_input():
 
 print("[INFO] Loading object detection model")
 model_init()
+print("[INFO] Model loaded")
+print("[INFO] Initializing PIR sensor")
 pir = pir_init()
+print("[INFO] PIR sensor initialized")
 
 while True:
     if not pir.available():
@@ -32,17 +35,27 @@ while True:
         print("[INFO] Waiting 5 seconds for stabilization")
         sleep(5)
 
-        print("[INFO] Start detection")
+        print("[INFO] Capturing image")
         image = capture()
+        print("[INFO] Image captured")
+
+        print("[INFO] Start detection")
         results = detect(image)
-        print(results)
+        print("[INFO] Detection completed")
         classes = compare(results)
+        if not classes:
+            print("[INFO] No animals detected")
+            continue
+        print(f"[INFO] Animals detected: {', '.join(classes)}")
+
+        print("[INFO] Sending notification")
         msg = message(classes)
         notify(msg)
         print("[INFO] Notification sent")
 
         print("[INFO] Uploading captured image to Google Drive")
         upload_gd(image, "credentials.json", "1ENyRMNshsWLZKDLs9wYskuWU1pl-2Gkr")
+        print("[INFO] Image uploaded")
 
         print("[INFO] Suspend system for 60 secs, press any key to resume")
         thread = Thread(target=check_input)
