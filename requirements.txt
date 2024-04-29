@@ -2,3 +2,5 @@ sparkfun-qwiic-pir
 ultralytics
 tqdm
 opencv-python
+google
+google-api-python-client

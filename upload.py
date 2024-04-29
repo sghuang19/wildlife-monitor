@@ -1,52 +1,59 @@
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from google.auth.exceptions import RefreshError
+from google.auth.transport.requests import Request
+
 import os
 import tempfile
 import time
-from google.auth.exceptions import RefreshError
-from google.auth.transport.requests import Request
 from cv2 import imencode
 
-def upload_gd(image, service_account_key_file, folder_id):
-    SCOPES = ['https://www.googleapis.com/auth/drive.file']
-    credentials = Credentials.from_service_account_file(service_account_key_file, scopes=SCOPES)
+import config
 
-    if not credentials:
-        print("Failed to retrieve credentials.")
-        return
+print("[INFO] Initializing Google Drive API")
 
-    try:
-        credentials.refresh(Request())
-    except RefreshError as e:
-        print("Failed to refresh credentials:", e)
-        return
+enabled = True
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
+credentials = Credentials.from_service_account_file(config.KEY_FILE,
+                                                    scopes=SCOPES)
+if not credentials:
+    print("[ERROR] Failed to retrieve credentials.")
+    enabled = False
+try:
+    credentials.refresh(Request())
+except RefreshError as e:
+    print("[ERROR] Failed to refresh credentials:", e)
+    enabled = False
+
+if not enabled:
+    print("[ERROR] Errors occurred, Google Drive upload will be disabled.")
+else:
     service = build('drive', 'v3', credentials=credentials)
-    file_name = str(time.time()) + '.png'
+    print("[INFO] Google Drive API initialized")
 
-    
+
+def upload(image):
+    print("[INFO] Uploading captured image to Google Drive")
+    file_name = f"{time.time()}.jpg"
+    # TODO: readable file name
+
     image_bytes = imencode('.jpg', image)[1].tobytes()
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+    file_metadata = {'name': file_name, 'parents': [config.FOLDER_ID]}
+
+    with tempfile.NamedTemporaryFile(suffix='.jpg') as temp_file:
         temp_file.write(image_bytes)
         temp_file_name = temp_file.name
+        media_body = MediaFileUpload(temp_file_name, mimetype='image/png')
 
-    media_body = MediaFileUpload(temp_file_name, mimetype='image/png', resumable=True)
-    file_metadata = {'name': file_name, 'parents': [folder_id]}  # Set the folder ID here
-
-    try:
-        file = service.files().create(body=file_metadata, media_body=media_body, fields='id').execute()
-        print('File ID:', file.get('id'))
-    except Exception as e:
-        print("An error occurred while uploading the file:", e)
-    finally:
-        os.unlink(temp_file_name)  # Ensure the temporary file is deleted after upload
-
-if __name__ == "__main__":
-    with open("nerd.png", "rb") as image_file:
-        image_data = image_file.read()
-
-    service_account_key_file = "credentials.json"
-    folder_id = "1ENyRMNshsWLZKDLs9wYskuWU1pl-2Gkr"  # Replace with your actual folder ID
-    upload_gd(image_data, service_account_key_file, folder_id)
-
+        try:
+            file = service.files().create(body=file_metadata,
+                                          media_body=media_body,
+                                          fields='id').execute()
+            print('[INFO] File ID:', file.get('id'))
+            print('[INFO] Image uploaded to Google Drive')
+        except Exception as e:
+            print("[ERROR] An error occurred while uploading the image:", e)
+        finally:
+            os.unlink(temp_file_name)

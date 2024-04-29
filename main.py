@@ -49,9 +49,7 @@ while True:
         notify(msg)
         print("[INFO] Notification sent")
 
-        print("[INFO] Uploading captured image to Google Drive")
-        upload_gd(image, "credentials.json", "1ENyRMNshsWLZKDLs9wYskuWU1pl-2Gkr")
-        print("[INFO] Image uploaded")
+        upload(image)
 
         print("[INFO] Suspend system for 60 secs, press any key to resume")
         thread = Thread(target=check_input)
