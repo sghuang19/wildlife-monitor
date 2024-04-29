@@ -2,14 +2,13 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import os
-from io import BytesIO
-from PIL import Image
 import tempfile
 import time
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
+from cv2 import imencode
 
-def upload_gd(image_data, service_account_key_file, folder_id):
+def upload_gd(image, service_account_key_file, folder_id):
     SCOPES = ['https://www.googleapis.com/auth/drive.file']
     credentials = Credentials.from_service_account_file(service_account_key_file, scopes=SCOPES)
 
@@ -26,8 +25,10 @@ def upload_gd(image_data, service_account_key_file, folder_id):
     service = build('drive', 'v3', credentials=credentials)
     file_name = str(time.time()) + '.png'
 
+    
+    image_bytes = imencode('.jpg', image)[1].tobytes()
     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-        temp_file.write(image_data)
+        temp_file.write(image_bytes)
         temp_file_name = temp_file.name
 
     media_body = MediaFileUpload(temp_file_name, mimetype='image/png', resumable=True)

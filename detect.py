@@ -2,7 +2,6 @@ from ultralytics import YOLO
 import os
 import config
 
-global model
 
 
 def model_init():
@@ -17,13 +16,16 @@ def model_init():
             exit(1)
 
     # Initialize the model
-    global model
-    model = YOLO("yolov8n.pt")
+    return YOLO("yolov8n.pt")
+
+
+print("[INFO] Initializing object detection model")
+model = model_init()
+print("[INFO] Model loaded")
 
 
 def detect(image):
     # image can be either a path or a PIL object
-    global model
     return model(image)
 
 

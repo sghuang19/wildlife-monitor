@@ -7,9 +7,6 @@ from upload import *
 from time import sleep
 from threading import Thread
 
-from PIL import Image
-from io import BytesIO
-
 pressed = False
 
 
@@ -19,9 +16,6 @@ def check_input():
     pressed = True
 
 
-print("[INFO] Loading object detection model")
-model_init()
-print("[INFO] Model loaded")
 print("[INFO] Initializing PIR sensor")
 pir = pir_init()
 print("[INFO] PIR sensor initialized")
@@ -37,6 +31,8 @@ while True:
 
         print("[INFO] Capturing image")
         image = capture()
+        if image is None:
+            continue
         print("[INFO] Image captured")
 
         print("[INFO] Start detection")
