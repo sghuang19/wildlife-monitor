@@ -2,9 +2,13 @@ from capture import *
 from detect import *
 from notify import *
 from motion import *
+from upload import *
 
 from time import sleep
 from threading import Thread
+
+from PIL import Image
+from io import BytesIO
 
 pressed = False
 
@@ -15,6 +19,7 @@ def check_input():
     pressed = True
 
 
+print("[INFO] Loading object detection model")
 model_init()
 pir = pir_init()
 
@@ -36,7 +41,8 @@ while True:
         notify(msg)
         print("[INFO] Notification sent")
 
-        # TODO: upload captured images to cloud
+        print("[INFO] Uploading captured image to Google Drive")
+        upload_gd(image, "credentials.json", "1ENyRMNshsWLZKDLs9wYskuWU1pl-2Gkr")
 
         print("[INFO] Suspend system for 60 secs, press any key to resume")
         thread = Thread(target=check_input)
