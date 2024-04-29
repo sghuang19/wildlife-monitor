@@ -1,7 +1,8 @@
-import config
-import os
-import urllib.parse
+from os import system
 from sys import stderr
+from urllib import parse
+
+from config import NOTIFY_API
 
 
 def message(classes):
@@ -10,12 +11,14 @@ def message(classes):
 
 
 def notify(msg):
-    if os.system(f"curl \"{config.NOTIFY_API}{urllib.parse.quote(msg)}\""):
+    print("[INFO] Sending notification")
+    if system(f"curl \"{NOTIFY_API}{parse.quote(msg)}\""):
         print(f"[ERROR] Failed to send message: {msg}", file=stderr)
     else:
         print(f"[INFO] Message sent: {msg}")
 
 
 if __name__ == "__main__":
+    # test cases
     msg = message({"cat", "dog"})
     notify(msg)

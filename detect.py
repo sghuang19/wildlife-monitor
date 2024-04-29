@@ -1,32 +1,31 @@
 from ultralytics import YOLO
 import os
-import config
+from sys import stderr
 
-
-
-def model_init():
-    # Fetching the pre-trained weights
-    if not os.path.exists("yolov8n.pt"):
-        print(
-            f"[INFO] Downloading the pre-trained weights from "
-            f"{config.PT_PATH}")
-        if os.system(f"wget {config.PT_PATH}") != 0:
-            print("[ERROR] Failed to download the pre-trained weights",
-                  file=sys.stderr)
-            exit(1)
-
-    # Initialize the model
-    return YOLO("yolov8n.pt")
-
+from config import PT_PATH, CLASSES
 
 print("[INFO] Initializing object detection model")
-model = model_init()
+
+# Fetching the pre-trained weights
+if not os.path.exists("yolov8n.pt"):
+    print(f"[INFO] Downloading the pre-trained weights from {PT_PATH}")
+    if os.system(f"wget {PT_PATH}") != 0:
+        print("[ERROR] Failed to download the pre-trained weights", file=stderr)
+        exit(1)
+    print("[INFO] Pre-trained weights downloaded")
+
+# Initialize the model
+model = YOLO("yolov8n.pt")
+
 print("[INFO] Model loaded")
 
 
 def detect(image):
     # image can be either a path or a PIL object
-    return model(image)
+    print("[INFO] Start detection")
+    result = model(image)
+    print("[INFO] Detection completed")
+    return result
 
 
 def compare(results):
@@ -34,19 +33,6 @@ def compare(results):
     classes = set()
     for cls in result.boxes.cls:  # get boxes detected
         name = result.names[cls.item()]  # get name of the class
-        if name in config.CLASSES:
+        if name in CLASSES:
             classes.add(name)
     return classes
-
-
-if __name__ == "__main__":
-    import sys
-
-    if len(sys.argv) < 2:
-        path = "https://http.cat/404.jpg"  # use default image if not provided
-    else:
-        path = sys.argv[1]
-    model_init()
-    results = detect(path)
-    classes = compare(results)
-    print(classes)

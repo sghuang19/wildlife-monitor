@@ -1,8 +1,8 @@
-from capture import *
-from detect import *
-from notify import *
-from motion import *
-from upload import *
+from detect import detect, compare
+from motion import pir
+from upload import upload
+from capture import capture
+from notify import message, notify
 
 from time import sleep
 from threading import Thread
@@ -16,10 +16,6 @@ def check_input():
     pressed = True
 
 
-print("[INFO] Initializing PIR sensor")
-pir = pir_init()
-print("[INFO] PIR sensor initialized")
-
 while True:
     if not pir.available():
         continue
@@ -29,25 +25,19 @@ while True:
         print("[INFO] Waiting 5 seconds for stabilization")
         sleep(5)
 
-        print("[INFO] Capturing image")
         image = capture()
         if image is None:
             continue
-        print("[INFO] Image captured")
 
-        print("[INFO] Start detection")
         results = detect(image)
-        print("[INFO] Detection completed")
         classes = compare(results)
         if not classes:
             print("[INFO] No animals detected")
             continue
         print(f"[INFO] Animals detected: {', '.join(classes)}")
 
-        print("[INFO] Sending notification")
         msg = message(classes)
         notify(msg)
-        print("[INFO] Notification sent")
 
         upload(image)
 
@@ -62,4 +52,4 @@ while True:
     if pir.object_removed():
         print("[INFO] Object Removed")
     pir.clear_event_bits()
-    sleep(0.2)
+    sleep(1)
