@@ -55,5 +55,3 @@ def upload(image):
             print('[INFO] Image uploaded to Google Drive')
         except Exception as e:
             print("[ERROR] An error occurred while uploading the image:", e)
-        finally:
-            os.unlink(temp_file_name)
